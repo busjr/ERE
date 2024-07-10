@@ -34,7 +34,7 @@ def Encrypt_Ere(dir):
         else:
             Choice()
     except ValueError:
-            print('File not found or file extension not supported.(Please check the full path to the file or its .txt extension.)')
+            print('File not found or file extension not supported.(Please check the full path to the file or its .txt extension and open the program with administrator rights.)')
 
 def Decipher_Ere(dir):
     try:
@@ -46,7 +46,7 @@ def Decipher_Ere(dir):
         else:
             Choice()
     except ValueError:
-        print('File not found or file extension not supported.(Please check the full path to the file or its .aes extension.)')
+        print('File not found or file extension not supported.(Please check the full path to the file or its .aes extension and open the program with administrator rights.)')
 
 def Encrypt():
     input_user = input('Path file for encrypt: ')
