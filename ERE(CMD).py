@@ -1,14 +1,15 @@
-import pyAesCrypt
 from os import system
 from getpass import getpass
-    
+from pyAesCrypt import encryptFile, decryptFile
+
+
 def Choice():
     try:
         print("""
 ███████╗██████╗ ███████╗
 ██╔════╝██╔══██╗██╔════╝
-█████╗  ██████╔╝█████╗  
-██╔══╝  ██╔══██╗██╔══╝  
+█████╗  ██████╔╝█████╗
+██╔══╝  ██╔══██╗██╔══╝
 ███████╗██║  ██║███████╗
 ╚══════╝╚═╝  ╚═╝╚══════╝v.0.4 by busjr
 --------------------------------------
@@ -30,20 +31,25 @@ def Choice():
         system('cls')
         Choice()
 
-def Encrypt(): 
+
+def Encrypt():
     try:
         path = input('Path file for encrypt: ')
-        if  path != '3':
+        if path != '3':
             path.replace("/", "\\")
             password = getpass("password: ",  stream="*")
-            pyAesCrypt.encryptFile(path, path + ".aes", password)
+            encryptFile(path, path + ".aes", password)
         else:
             system('cls')
             Choice()
-    except ValueError:
-            system('cls')
-            print("\033[31m" + 'ERORRE: File not found or file extension not supported.(Please check the full path to the file or its .aes extension and open the program with administrator rights.' + "\033[0m")
-            Choice()
+    except Exception:
+        system('cls')
+        print("\033[31m" + ('ERROR: File not found or file extension not '
+                            'supported. (Please check the full path to the '
+                            'file or its .aes extension and open the program '
+                            'with administrator rights.' + "\033[0m"))
+        Choice()
+
 
 def Decrypt():
     try:
@@ -51,14 +57,18 @@ def Decrypt():
         if path != '3':
             path.replace("/", "\\")
             password = getpass("password: ", stream="*")
-            pyAesCrypt.decryptFile(path, path + " dataout.txt", password)
+            decryptFile(path, path + " dataout.txt", password)
         else:
             system('cls')
             Choice()
-    except ValueError:
+    except Exception:
         system('cls')
-        print("\033[31m" + 'ERORRE: File not found or file extension not supported.(Please check the full path to the file or its .aes extension and open the program with administrator rights.' + "\033[0m")
+        print("\033[31m" + ('ERROR: File not found or file extension not '
+                            'supported. (Please check the full path to the '
+                            'file or its .aes extension and open the program '
+                            'with administrator rights.' + "\033[0m"))
         Choice()
 
-if __name__ == "__main__":       
+
+if __name__ == "__main__":
     Choice()
