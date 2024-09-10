@@ -5,7 +5,7 @@ from customtkinter import filedialog
 from CTkMessagebox import CTkMessagebox
 from pyAesCrypt import encryptStream, decryptStream
 
-__version__ = "v1.4"
+__version__ = "v0.5"
 
 
 class MyFrame(ct.CTkScrollableFrame):
