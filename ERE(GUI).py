@@ -1,6 +1,5 @@
 import io
 import os
-import winreg
 import sys
 import subprocess
 import customtkinter as ct
@@ -245,44 +244,37 @@ If you want to enable the context menu, click "Yes"
 
         if response == "Yes":
             script_path = sys.argv[0]
-
-            key = winreg.OpenKey(
-                winreg.HKEY_CLASSES_ROOT,
-                "directory\\background\\shell",
-                0,
-                winreg.KEY_WRITE,
+            base_path = r"HKEY_CLASSES_ROOT\Directory\Background\shell"
+            key_name = "ERE"
+            command_key_path = f"{base_path}\\{key_name}\\command"
+            subprocess.run(
+                [
+                    "reg",
+                    "add",
+                    f"{base_path}\\{key_name}",
+                    "/ve",
+                    "/t",
+                    "REG_SZ",
+                    "/d",
+                    "Open in ERE",
+                    "/f",
+                ],
+                check=True,
             )
-
-            winreg.CreateKey(key, "ERE")
-
-            key2 = winreg.OpenKey(
-                winreg.HKEY_CLASSES_ROOT,
-                "directory\\background\\shell\\ERE",
-                0,
-                winreg.KEY_WRITE,
+            subprocess.run(
+                [
+                    "reg",
+                    "add",
+                    command_key_path,
+                    "/ve",
+                    "/t",
+                    "REG_SZ",
+                    "/d",
+                    script_path,
+                    "/f",
+                ],
+                check=True,
             )
-
-            winreg.SetValueEx(key2, "", 0, winreg.REG_SZ, "Open in ERE")
-
-            key3 = winreg.OpenKey(
-                winreg.HKEY_CLASSES_ROOT,
-                "directory\\background\\shell\\ERE",
-                0,
-                winreg.KEY_WRITE,
-            )
-
-            winreg.CreateKey(key3, "command")
-
-            key4 = winreg.OpenKey(
-                winreg.HKEY_CLASSES_ROOT,
-                "directory\\background\\shell\\ERE\\command",
-                0,
-                winreg.KEY_WRITE,
-            )
-
-            winreg.SetValueEx(key4, "", 0, winreg.REG_SZ, script_path)
-
-            winreg.CloseKey(key)
 
     def path(self):
         filename = filedialog.askopenfilename()
