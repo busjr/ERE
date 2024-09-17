@@ -1,11 +1,13 @@
 import io
 import os
+import winreg
+import sys
 import customtkinter as ct
 from customtkinter import filedialog
 from CTkMessagebox import CTkMessagebox
 from pyAesCrypt import encryptStream, decryptStream
 
-__version__ = "v0.5"
+__version__ = "v0.6"
 
 
 class MyFrame(ct.CTkScrollableFrame):
@@ -30,9 +32,10 @@ class App(ct.CTk):
         self.geometry(f"400x435+{x}+{y}")
         self._fg_color = "#1f1f1f"
         self.title(f"Keypy {__version__} (by busjr)")
-        self.ico_path = os.path.join(os.path.dirname(__file__), 'icon.ico')
+        self.ico_path = os.path.join(os.path.dirname(__file__), "icon.ico")
         self.iconbitmap(self.ico_path)
-        self.icon_warning = os.path.join(os.path.dirname(__file__), 'war.png')
+        self.icon_warning = os.path.join(os.path.dirname(__file__), "war.png")
+        self.icon_que = os.path.join(os.path.dirname(__file__), "que.png")
         self.resizable(False, False)
 
         tabview = ct.CTkTabview(
@@ -47,7 +50,7 @@ class App(ct.CTk):
             segmented_button_unselected_hover_color="#2a2c2c",
             text_color="#707070",
             corner_radius=10,
-            anchor=ct.CENTER
+            anchor=ct.CENTER,
         )
         tabview.pack(padx=0, pady=0)
 
@@ -64,7 +67,7 @@ class App(ct.CTk):
             height=30,
             fg_color="#1f1f1f",
             corner_radius=10,
-            border_width=1
+            border_width=1,
         )
         self.Entry_path.grid(padx=0, pady=5, row=0, column=0)
 
@@ -76,9 +79,21 @@ class App(ct.CTk):
             width=50,
             height=30,
             fg_color="#1d1e1e",
-            hover_color="#2a2c2c"
+            hover_color="#2a2c2c",
         )
         self.button_path.grid(padx=5, pady=5, row=0, column=1)
+
+        self.button_menu = ct.CTkButton(
+            master=tabview.tab("OPEN"),
+            text="!",
+            text_color="green",
+            command=self.menu,
+            width=5,
+            height=5,
+            fg_color="#1d1e1e",
+            hover_color="#2a2c2c",
+        )
+        self.button_menu.grid(padx=5, pady=2, row=0, column=2)
 
         # open Entry_password
 
@@ -91,7 +106,7 @@ class App(ct.CTk):
             height=30,
             fg_color="#1f1f1f",
             corner_radius=10,
-            border_width=1
+            border_width=1,
         )
         self.Entry_password.grid(padx=0, pady=5, row=1, column=0)
 
@@ -103,7 +118,7 @@ class App(ct.CTk):
             width=50,
             height=30,
             fg_color="#1d1e1e",
-            hover_color="#2a2c2c"
+            hover_color="#2a2c2c",
         )
         self.button_password.grid(padx=5, pady=5, row=1, column=1)
 
@@ -114,7 +129,7 @@ class App(ct.CTk):
             width=300,
             height=300,
             fg_color="#181818",
-            wrap="none"
+            wrap="none",
         )
         self.text_box1.grid(padx=2, pady=2, row=2, column=0)
 
@@ -125,7 +140,7 @@ class App(ct.CTk):
             width=300,
             height=300,
             fg_color="#181818",
-            wrap="none"
+            wrap="none",
         )
         self.text_box2.grid(padx=2, pady=2, row=0, column=0)
 
@@ -139,7 +154,7 @@ class App(ct.CTk):
             height=30,
             fg_color="#1f1f1f",
             corner_radius=10,
-            border_width=1
+            border_width=1,
         )
         self.Entry_path2.grid(padx=0, pady=5, row=1, column=0)
 
@@ -151,7 +166,7 @@ class App(ct.CTk):
             width=50,
             height=30,
             fg_color="#1d1e1e",
-            hover_color="#2a2c2c"
+            hover_color="#2a2c2c",
         )
         self.button_path2.grid(padx=5, pady=5, row=1, column=1)
 
@@ -166,7 +181,7 @@ class App(ct.CTk):
             height=30,
             fg_color="#1f1f1f",
             corner_radius=10,
-            border_width=1
+            border_width=1,
         )
         self.Entry_password2.grid(padx=0, pady=5, row=2, column=0)
 
@@ -178,21 +193,85 @@ class App(ct.CTk):
             width=50,
             height=30,
             fg_color="#1d1e1e",
-            hover_color="#2a2c2c"
+            hover_color="#2a2c2c",
         )
         self.button_password2.grid(padx=5, pady=5, row=2, column=1)
 
+        # message
+
+    def menu(self):
+        message = CTkMessagebox(
+            title="Info",
+            title_color="#696969",
+            icon=self.icon_que,
+            option_1="Cancel",
+            option_2="No",
+            option_3="Yes",
+            text_color="#696969",
+            button_text_color="#696969",
+            button_color="#1d1e1e",
+            button_hover_color="#2a2c2c",
+            fg_color="#1f1f1f",
+            bg_color="#1f1f1f",
+            message="""
+If you want to enable the context menu, click "Yes"
+(When moving .exe file, click here again").
+            """,
+        )
+
+        response = message.get()
+
+        if response == "Yes":
+            script_path = sys.argv[0]
+
+            key = winreg.OpenKey(
+                winreg.HKEY_CLASSES_ROOT,
+                "directory\\background\\shell",
+                0,
+                winreg.KEY_WRITE,
+            )
+
+            winreg.CreateKey(key, "ERE")
+
+            key2 = winreg.OpenKey(
+                winreg.HKEY_CLASSES_ROOT,
+                "directory\\background\\shell\\ERE",
+                0,
+                winreg.KEY_WRITE,
+            )
+
+            winreg.SetValueEx(key2, "", 0, winreg.REG_SZ, "Open in ERE")
+
+            key3 = winreg.OpenKey(
+                winreg.HKEY_CLASSES_ROOT,
+                "directory\\background\\shell\\ERE",
+                0,
+                winreg.KEY_WRITE,
+            )
+
+            winreg.CreateKey(key3, "command")
+
+            key4 = winreg.OpenKey(
+                winreg.HKEY_CLASSES_ROOT,
+                "directory\\background\\shell\\ERE\\command",
+                0,
+                winreg.KEY_WRITE,
+            )
+
+            winreg.SetValueEx(key4, "", 0, winreg.REG_SZ, script_path)
+
+            winreg.CloseKey(key)
+
     def path(self):
         filename = filedialog.askopenfilename()
-        self.Entry_path.delete(0, 'end')
+        self.Entry_path.delete(0, "end")
         self.Entry_path.insert(0, filename)
 
     def path_save(self):
         file_path = filedialog.asksaveasfilename(
-            defaultextension=".aes",
-            filetypes=[("AES files", "*.aes")]
+            defaultextension=".aes", filetypes=[("AES files", "*.aes")]
         )
-        self.Entry_path2.delete(0, 'end')
+        self.Entry_path2.delete(0, "end")
         self.Entry_path2.insert(0, file_path)
 
     def decrypt_aes_file(self):
@@ -209,19 +288,27 @@ class App(ct.CTk):
             fDec = io.BytesIO()
             decryptStream(fCiph, fDec, password, bufferSize)
 
-            decrypted_data = fDec.getvalue().decode('utf-8')
+            decrypted_data = fDec.getvalue().decode("utf-8")
             self.text_box1.delete("1.0", "end")
             self.text_box1.insert("1.0", decrypted_data)
         except Exception:
             CTkMessagebox(
                 title="Error",
+                title_color="#696969",
                 icon=self.icon_warning,
                 option_1="Cancel",
+                text_color="#696969",
+                button_text_color="#696969",
+                button_color="#1d1e1e",
+                button_hover_color="#2a2c2c",
+                fg_color="#1f1f1f",
+                bg_color="#1f1f1f",
                 message="""
 File not found or password is incorrect.
 (Check the full path to the extension or check your password.
 If nothing helps, open the program with administrator rights.)
-                """,)
+                """,
+            )
 
     def encrypt_aes_file(self):
         try:
@@ -231,20 +318,28 @@ If nothing helps, open the program with administrator rights.)
             bufferSize = 64 * 1024
 
             input_buffer = io.BytesIO(text.encode())
-            with open(file_path, 'wb') as output_file:
+            with open(file_path, "wb") as output_file:
                 encryptStream(input_buffer, output_file, password, bufferSize)
             open_dir = os.path.dirname(file_path)
             os.startfile(open_dir)
         except Exception:
             CTkMessagebox(
                 title="Error",
+                title_color="#696969",
                 icon=self.icon_warning,
                 option_1="Cancel",
+                text_color="#696969",
+                button_text_color="#696969",
+                button_color="#1d1e1e",
+                button_hover_color="#2a2c2c",
+                fg_color="#1f1f1f",
+                bg_color="#1f1f1f",
                 message="""
 File not found or password is incorrect.
 (Check the full path to the extension or check your password.
 If nothing helps, open the program with administrator rights.)
-                """,)
+                """,
+            )
 
 
 if __name__ == "__main__":
