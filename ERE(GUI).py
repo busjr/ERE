@@ -2,9 +2,11 @@ import io
 import os
 import winreg
 import sys
+import subprocess
 import customtkinter as ct
 from customtkinter import filedialog
 from CTkMessagebox import CTkMessagebox
+from CTkToolTip import CTkToolTip
 from pyAesCrypt import encryptStream, decryptStream
 
 __version__ = "v0.6"
@@ -94,6 +96,7 @@ class App(ct.CTk):
             hover_color="#2a2c2c",
         )
         self.button_menu.grid(padx=5, pady=2, row=0, column=2)
+        CTkToolTip(self.button_menu, delay=0.5, message="Enable context menu")
 
         # open Entry_password
 
@@ -121,6 +124,20 @@ class App(ct.CTk):
             hover_color="#2a2c2c",
         )
         self.button_password.grid(padx=5, pady=5, row=1, column=1)
+
+        self.button_menu_delete = ct.CTkButton(
+            master=tabview.tab("OPEN"),
+            text="!",
+            text_color="green",
+            command=self.menu_delete,
+            width=5,
+            height=5,
+            fg_color="#1d1e1e",
+            hover_color="#2a2c2c",
+        )
+        self.button_menu_delete.grid(padx=5, pady=2, row=1, column=2)
+        CTkToolTip(self.button_menu_delete,
+                   delay=0.5, message="Disable context menu")
 
         # open text_box1
 
@@ -198,6 +215,11 @@ class App(ct.CTk):
         self.button_password2.grid(padx=5, pady=5, row=2, column=1)
 
         # message
+
+    def menu_delete(self):
+        path = r"HKEY_CLASSES_ROOT\Directory\Background\shell\ERE"
+        command = ["reg", "delete", path, "/f"]
+        subprocess.run(command, check=True)
 
     def menu(self):
         message = CTkMessagebox(
