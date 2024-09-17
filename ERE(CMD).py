@@ -77,15 +77,15 @@ def menu():
             check=True,
         )
         system("cls")
-        print("Done")
+        print("Done.")
         Choice()
     except Exception:
         system("cls")
         print(
             "\033[31m"
             + (
-                'If you want to enable the context menu, click "Yes" '
-                "(When moving .exe file, choice here again)." + "\033[0m"
+                'If issues arise, run the file with administrator rights also,'
+                "(if you move the .exe file again, choice on 4)." + "\033[0m"
             )
         )
         Choice()
@@ -104,8 +104,8 @@ def menu_delete():
         print(
             "\033[31m"
             + (
-                'If you want to enable the context menu, click "Yes" '
-                "(When moving .exe file, choice here again)." + "\033[0m"
+                'If issues arise, run the file with administrator rights also,'
+                "(if you move the .exe file again, choice on 4)." + "\033[0m"
             )
         )
         Choice()
