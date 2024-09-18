@@ -77,7 +77,7 @@ def menu():
             check=True,
         )
         system("cls")
-        print("Done.")
+        print("\033[32m" + "Done." + "\033[0m")
         Choice()
     except Exception:
         system("cls")
@@ -97,7 +97,7 @@ def menu_delete():
         command = ["reg", "delete", path, "/f"]
         subprocess.run(command, check=True)
         system("cls")
-        print("Done")
+        print("\033[32m" + "Done." + "\033[0m")
         Choice()
     except Exception:
         system("cls")
@@ -118,6 +118,9 @@ def Encrypt():
             path.replace("/", "\\")
             password = getpass("password: ", stream="*")
             encryptFile(path, path + ".aes", password)
+            system("cls")
+            print("\033[32m" + path + "\033[0m")
+            Choice()
         else:
             system("cls")
             Choice()
@@ -142,6 +145,9 @@ def Decrypt():
             path.replace("/", "\\")
             password = getpass("password: ", stream="*")
             decryptFile(path, path + " dataout.txt", password)
+            system("cls")
+            print("\033[32m" + path + "\033[0m")
+            Choice()
         else:
             system("cls")
             Choice()
