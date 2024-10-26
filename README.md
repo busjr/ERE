@@ -12,7 +12,7 @@ This tool helps you hide your .txt files that store important information.
 
 1. Decryption
    - Select the OPEN tab
-   - Enter the full path to the file or click the PATH button to choose your file
+   - Enter the full path to the file or click the PATH button to choose your file (You can also drag and drop the file into the field)
    - Enter the password
 
 2. Encryption
