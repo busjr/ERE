@@ -2,11 +2,13 @@ import io
 import os
 import sys
 import subprocess
+import hashlib
 import customtkinter as ct
 from customtkinter import filedialog
 from CTkMessagebox import CTkMessagebox
 from CTkToolTip import CTkToolTip
 from pyAesCrypt import encryptStream, decryptStream
+from tkinterdnd2 import DND_FILES, TkinterDnD
 
 __version__ = "v0.6"
 
@@ -20,9 +22,10 @@ class MyFrame(ct.CTkScrollableFrame):
         label.grid(row=0, column=0, padx=20)
 
 
-class App(ct.CTk):
+class App(ct.CTk, TkinterDnD.DnDWrapper):
     def __init__(self):
         super().__init__()
+        self.TkdndVersion = TkinterDnD._require(self)
 
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -71,6 +74,10 @@ class App(ct.CTk):
             border_width=1,
         )
         self.Entry_path.grid(padx=0, pady=5, row=0, column=0)
+        self.Entry_path.bind("<Button-3>", lambda event: self.paste_text(event, who=self.Entry_path))
+        self.Entry_path.bind("<Return>", lambda event: self.Entry_password.focus())
+        self.Entry_path.drop_target_register(DND_FILES)
+        self.Entry_path.dnd_bind('<<Drop>>', lambda event: self.drop(event, who=self.Entry_path))
 
         self.button_path = ct.CTkButton(
             master=tabview.tab("OPEN"),
@@ -111,6 +118,8 @@ class App(ct.CTk):
             border_width=1,
         )
         self.Entry_password.grid(padx=0, pady=5, row=1, column=0)
+        self.Entry_password.bind("<Button-3>", lambda event: self.paste_text(event, who=self.Entry_password))
+        self.Entry_password.bind("<Return>", lambda event: self.Entry_path.focus())
 
         self.button_password = ct.CTkButton(
             master=tabview.tab("OPEN"),
@@ -148,6 +157,7 @@ class App(ct.CTk):
             wrap="none",
         )
         self.text_box1.grid(padx=2, pady=2, row=2, column=0)
+        self.text_box1.bind("<Button-3>", lambda event: self.paste_text(event, who=self.text_box1))
 
         # create text_box2
 
@@ -159,6 +169,7 @@ class App(ct.CTk):
             wrap="none",
         )
         self.text_box2.grid(padx=2, pady=2, row=0, column=0)
+        self.text_box2.bind("<Button-3>", lambda event: self.paste_text(event, who=self.text_box2))
 
         # create Entry_path2
 
@@ -173,6 +184,8 @@ class App(ct.CTk):
             border_width=1,
         )
         self.Entry_path2.grid(padx=0, pady=5, row=1, column=0)
+        self.Entry_path2.bind("<Button-3>", lambda event: self.paste_text(event, who=self.Entry_path2))
+        self.Entry_path2.bind("<Return>", lambda event: self.Entry_password2.focus())
 
         self.button_path2 = ct.CTkButton(
             master=tabview.tab("CREATE"),
@@ -200,6 +213,8 @@ class App(ct.CTk):
             border_width=1,
         )
         self.Entry_password2.grid(padx=0, pady=5, row=2, column=0)
+        self.Entry_password2.bind("<Button-3>", lambda event: self.paste_text(event, who=self.Entry_password2))
+        self.Entry_password2.bind("<Return>", lambda event: self.Entry_path2.focus())
 
         self.button_password2 = ct.CTkButton(
             master=tabview.tab("CREATE"),
@@ -276,6 +291,15 @@ If you want to enable the context menu, click "Yes"
                 check=True,
             )
 
+    def drop(self, event, who):
+        file_path = event.data
+        who.delete(0, ct.END)
+        who.insert(0, file_path)
+
+    def paste_text(self, event, who):
+        text = self.clipboard_get()
+        who.insert(ct.END, text)
+
     def path(self):
         filename = filedialog.askopenfilename()
         self.Entry_path.delete(0, "end")
@@ -294,15 +318,20 @@ If you want to enable the context menu, click "Yes"
             password = self.Entry_password.get()
             bufferSize = 64 * 1024
 
+            hpassword = hashlib.sha256(password.encode()).hexdigest()
+
             with open(file_path, "rb") as fIn:
                 fCiph = io.BytesIO(fIn.read())
 
             fCiph.seek(0)
 
             fDec = io.BytesIO()
-            decryptStream(fCiph, fDec, password, bufferSize)
+            decryptStream(fCiph, fDec, hpassword, bufferSize)
 
             decrypted_data = fDec.getvalue().decode("utf-8")
+
+            del password, hpassword
+            self.Entry_password.delete(0, ct.END)
             self.text_box1.delete("1.0", "end")
             self.text_box1.insert("1.0", decrypted_data)
         except Exception:
@@ -331,9 +360,15 @@ If nothing helps, open the program with administrator rights.)
             password = self.Entry_password2.get()
             bufferSize = 64 * 1024
 
+            hpassword = hashlib.sha256(password.encode()).hexdigest()
+
             input_buffer = io.BytesIO(text.encode())
+
             with open(file_path, "wb") as output_file:
-                encryptStream(input_buffer, output_file, password, bufferSize)
+                encryptStream(input_buffer, output_file, hpassword, bufferSize)
+
+            del password, hpassword
+
             open_dir = os.path.dirname(file_path)
             os.startfile(open_dir)
         except Exception:
