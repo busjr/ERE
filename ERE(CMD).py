@@ -1,14 +1,21 @@
 import sys
-import subprocess
-from os import system
+from os import system, name
 from getpass import getpass
 from pyAesCrypt import encryptFile, decryptFile
 
 
-def Choice():
-    try:
-        print(
-            """
+def ClearCMD():
+    if name == 'nt':
+        system("cls")
+    else:
+        system("clear")
+
+
+def Main():
+    while True:
+        try:
+            print(
+                """
 ███████╗██████╗ ███████╗
 ██╔════╝██╔══██╗██╔════╝
 █████╗  ██████╔╝█████╗
@@ -17,153 +24,70 @@ def Choice():
 ╚══════╝╚═╝  ╚═╝╚══════╝v.0.6 by busjr
 --------------------------------------
 [1] - Encrypt
-[2] - Decipher
+[2] - Decrypt
 [3] - Back
-[4] - Enable context menu
-[5] - Disable context menu
-[6] - Exit"""
-        )
-        input_user = int(input(">"))
-        if input_user == 1:
-            Encrypt()
-        elif input_user == 2:
-            Decrypt()
-        elif input_user == 4:
-            menu()
-        elif input_user == 5:
-            menu_delete()
-        elif input_user == 6:
-            exit()
-        else:
-            system("cls")
-            Choice()
-    except ValueError:
-        system("cls")
-        Choice()
-
-
-def menu():
-    try:
-        script_path = sys.argv[0]
-        base_path = r"HKEY_CLASSES_ROOT\Directory\Background\shell"
-        key_name = "ERE"
-        command_key_path = f"{base_path}\\{key_name}\\command"
-        subprocess.run(
-            [
-                "reg",
-                "add",
-                f"{base_path}\\{key_name}",
-                "/ve",
-                "/t",
-                "REG_SZ",
-                "/d",
-                "Open in ERE",
-                "/f",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                "reg",
-                "add",
-                command_key_path,
-                "/ve",
-                "/t",
-                "REG_SZ",
-                "/d",
-                script_path,
-                "/f",
-            ],
-            check=True,
-        )
-        system("cls")
-        print("\033[32m" + "Done." + "\033[0m")
-        Choice()
-    except Exception:
-        system("cls")
-        print(
-            "\033[31m"
-            + (
-                'If issues arise, run the file with administrator rights also,'
-                "(if you move the .exe file again, choice on 4)." + "\033[0m"
+[4] - Exit"""
             )
-        )
-        Choice()
-
-
-def menu_delete():
-    try:
-        path = r"HKEY_CLASSES_ROOT\Directory\Background\shell\ERE"
-        command = ["reg", "delete", path, "/f"]
-        subprocess.run(command, check=True)
-        system("cls")
-        print("\033[32m" + "Done." + "\033[0m")
-        Choice()
-    except Exception:
-        system("cls")
-        print(
-            "\033[31m"
-            + (
-                'If issues arise, run the file with administrator rights also,'
-                "(if you move the .exe file again, choice on 4)." + "\033[0m"
-            )
-        )
-        Choice()
+            input_user = int(input(">"))
+            if input_user == 1:
+                Encrypt()
+            elif input_user == 2:
+                Decrypt()
+            elif input_user == 3:
+                ClearCMD()
+            elif input_user == 4:
+                sys.exit()
+            else:
+                ClearCMD()
+                print("\033[31mERROR: Invalid input.\033[0m")
+        except ValueError:
+            ClearCMD()
+            print("\033[31mERROR: Invalid input.\033[0m")
 
 
 def Encrypt():
     try:
-        path = input("Path file for encrypt: ")
+        path = str(input("Path file for encrypt: "))
         if path != "3":
             path.replace("/", "\\")
-            password = getpass("password: ", stream="*")
+            password = getpass("password: ")
             encryptFile(path, path + ".aes", password)
-            system("cls")
+            ClearCMD()
             print("\033[32m" + path + "\033[0m")
-            Choice()
         else:
-            system("cls")
-            Choice()
+            ClearCMD()
+    except FileNotFoundError:
+        ClearCMD()
+        print("\033[31mERROR: File not found.\033[0m")
+    except ValueError:
+        ClearCMD()
+        print("\033[31mERROR: Invalid input.\033[0m")
     except Exception:
-        system("cls")
-        print(
-            "\033[31m"
-            + (
-                "ERROR: File not found or file extension not "
-                "supported. (Please check the full path to the "
-                "file or its .aes extension and open the program "
-                "with administrator rights." + "\033[0m"
-            )
-        )
-        Choice()
+        ClearCMD()
+        print("\033[31mERROR: Invalid input.\033[0m")
 
 
 def Decrypt():
     try:
-        path = input("Path file for decrypt: ")
+        path = str(input("Path file for decrypt: "))
         if path != "3":
             path.replace("/", "\\")
             password = getpass("password: ", stream="*")
             decryptFile(path, path + " dataout.txt", password)
-            system("cls")
+            ClearCMD()
             print("\033[32m" + path + "\033[0m")
-            Choice()
         else:
-            system("cls")
-            Choice()
+            ClearCMD()
+    except FileNotFoundError:
+        ClearCMD()
+        print("\033[31mERROR: File not found.\033[0m")
+    except ValueError:
+        ClearCMD()
+        print("\033[31mERROR: Invalid input.\033[0m")
     except Exception:
-        system("cls")
-        print(
-            "\033[31m"
-            + (
-                "ERROR: File not found or file extension not "
-                "supported. (Please check the full path to the "
-                "file or its .aes extension and open the program "
-                "with administrator rights." + "\033[0m"
-            )
-        )
-        Choice()
+        ClearCMD()
+        print("\033[31mERROR: Invalid input.\033[0m")
 
 
 if __name__ == "__main__":
-    Choice()
+    Main()
