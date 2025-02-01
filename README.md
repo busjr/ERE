@@ -27,7 +27,7 @@ This tool helps you hide your .txt files that store important information.
    !IMPORTANT: If you moved the .exe file, you'll need to click the button again
 
 # How use version CMD
-![CMD](https://github.com/user-attachments/assets/34419dfa-d9a5-4413-a8ae-75eaa46c7839)
+![CMD](https://github.com/user-attachments/assets/258d5e22-3003-42b6-a1a2-c7eeeebf7955)
 
 1. Encryption
    - To encryption, select Encrypt (1)
@@ -41,13 +41,7 @@ This tool helps you hide your .txt files that store important information.
 
 3. Back
    - If you select BACK (3), you can return from anywhere to the main menu
-
-4. Enable/Disable context menu
-   - To enable the context menu, select (4)
-   - To disable the context menu, select (5)
    
-   !IMPORTANT: If you moved the .exe file, you'll need to click the button again
-   
-6. Exit
+4. Exit
     - To exit the application.
 
