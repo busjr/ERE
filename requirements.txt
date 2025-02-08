@@ -1,9 +1,8 @@
-# for GUI apps 
-# CTkMessagebox==2.7
-# customtkinter==5.2.2
-# CTkToolTip==0.8
-# pillow==10.4.0
-
-getpass4==0.0.14.1
+customtkinter==5.2.2
+CTkMessagebox==2.7
+CTkToolTip==0.8
 pyAesCrypt==6.1.1
+tkinterdnd2==0.4.2
+getpass4==0.0.14.1
+
 
