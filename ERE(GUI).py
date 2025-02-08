@@ -73,6 +73,7 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.batton_context_open = self.create_batton(tabview.tab("OPEN"), "!", self.context_menu, 0, 2, tooltip="Enable context menu. (open file with admin administrator)")
 
         self.password_entry_open = self.create_entry(master=tabview.tab("OPEN"), placeholder="Password", handler=self.path_entry_open_handler, row=1, show_password="*")
+        self.show_password_open = self.create_batton(tabview.tab("OPEN"), "()", lambda: self.toggle_password_visibility(self.password_entry_open), 1, 1, tooltip="Show/Hide", x=270, y=50)
         self.batton_ok_open = self.create_batton(tabview.tab("OPEN"), "OK", self.decrypt_aes_file, 1, 1)
         self.batton_context_del_open = self.create_batton(tabview.tab("OPEN"), "!", self.context_menu_delete, 1, 2, tooltip="Disable context menu. (open file with admin administrator)",)
 
@@ -83,9 +84,17 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.batton_path_create = self.create_batton(tabview.tab("CREATE"), "PATH", self.path_save, 1, 1)
 
         self.password_entry_create = self.create_entry(master=tabview.tab("CREATE"), placeholder="Password", handler=self.entry_password_create_handler, row=2, show_password="*")
+        self.show_password_create = self.create_batton(tabview.tab("CREATE"), "()", lambda: self.toggle_password_visibility(self.password_entry_create), 1, 1, tooltip="Show/Hide", x=270, y=355)
         self.batton_ok_create = self.create_batton(tabview.tab("CREATE"), "OK", self.encrypt_aes_file, 2, 1)
 
         self.box_create = self.create_textbox(tabview.tab("CREATE"), 0)
+
+
+    def toggle_password_visibility(self, target_button):
+        if target_button.cget("show") == "":
+            target_button.configure(show="*")
+        else:
+            target_button.configure(show="")
 
     def password_entry_open_handler(self, event):
         self.password_entry_open.focus()
@@ -112,20 +121,25 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         return self.textbox
 
 
-    def create_batton(self, master, text, command, row, column, tooltip=None):
+    def create_batton(self, master, text, command, row, column, tooltip=None, x=None, y=None):
         self.button = ct.CTkButton(
             master=master,
             text=text,
             text_color="#696969" if text != "!" else "green",
             command=command,
-            width=50 if text != "!" else 5,
-            height=30 if text != "!" else 5,
+            width=20 if text == "()" else 50 if text != "!" else 5,
+            height=20 if text == "()" else 30 if text != "!" else 5,
             fg_color="#1d1e1e",
             hover_color="#2a2c2c",
         )
-        self.button.grid(padx=5, pady=5 if text != "!" else 2, row=row, column=column)
+        if x is not None and y is not None:
+            self.button.place(x=x, y=y)
+        else:
+            self.button.grid(padx=5, pady=5 if text != "!" else 2, row=row, column=column)
+
         if tooltip:
             CTkToolTip(self.button, delay=0.5, message=tooltip)
+
         return self.button
 
     def create_entry(self, master, placeholder, handler, row, show_password=None):
