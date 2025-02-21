@@ -1,5 +1,6 @@
 import io
 import os
+from os import name
 import sys
 import subprocess
 import hashlib
@@ -38,11 +39,12 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         x = (screen_width - 400) // 2
         y = (screen_height - 435) // 2
 
-        self.geometry(f"400x435+{x}+{y}")
+        self.geometry(f"400x440+{x}+{y}")
         self._fg_color = "#1f1f1f"
         self.title(f"Keypy {__version__} (by busjr)")
-        ico_path = os.path.join(os.path.dirname(__file__), "icon.ico")
-        self.iconbitmap(ico_path)
+        if name == "nt":
+            ico_path = os.path.join(os.path.dirname(__file__), "icon.ico")
+            self.iconbitmap(ico_path)
         self.icon_warning = os.path.join(os.path.dirname(__file__), "war.png")
         self.icon_que = os.path.join(os.path.dirname(__file__), "que.png")
         self.resizable(False, False)
@@ -73,7 +75,7 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.batton_context_open = self.create_batton(tabview.tab("OPEN"), "!", self.context_menu, 0, 2, tooltip="Enable context menu. (open file with admin administrator)")
 
         self.password_entry_open = self.create_entry(master=tabview.tab("OPEN"), placeholder="Password", handler=self.path_entry_open_handler, row=1, show_password="*")
-        self.show_password_open = self.create_batton(tabview.tab("OPEN"), "()", lambda: self.toggle_password_visibility(self.password_entry_open), 1, 1, tooltip="Show/Hide", x=270, y=50)
+        self.show_password_open = self.create_batton(tabview.tab("OPEN"), "()", lambda: self.toggle_password_visibility(self.password_entry_open), 1, 1, tooltip="Show/Hide", x=270, y=49)
         self.batton_ok_open = self.create_batton(tabview.tab("OPEN"), "OK", self.decrypt_aes_file, 1, 1)
         self.batton_context_del_open = self.create_batton(tabview.tab("OPEN"), "!", self.context_menu_delete, 1, 2, tooltip="Disable context menu. (open file with admin administrator)",)
 
@@ -84,11 +86,10 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.batton_path_create = self.create_batton(tabview.tab("CREATE"), "PATH", self.path_save, 1, 1)
 
         self.password_entry_create = self.create_entry(master=tabview.tab("CREATE"), placeholder="Password", handler=self.entry_password_create_handler, row=2, show_password="*")
-        self.show_password_create = self.create_batton(tabview.tab("CREATE"), "()", lambda: self.toggle_password_visibility(self.password_entry_create), 1, 1, tooltip="Show/Hide", x=270, y=355)
+        self.show_password_create = self.create_batton(tabview.tab("CREATE"), "()", lambda: self.toggle_password_visibility(self.password_entry_create), 1, 1, tooltip="Show/Hide", x=270, y=353)
         self.batton_ok_create = self.create_batton(tabview.tab("CREATE"), "OK", self.encrypt_aes_file, 2, 1)
 
         self.box_create = self.create_textbox(tabview.tab("CREATE"), 0)
-
 
     def toggle_password_visibility(self, target_button):
         if target_button.cget("show") == "":
@@ -114,12 +115,12 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
             width=300,
             height=300,
             fg_color="#181818",
+            text_color="#696969",
             wrap="none",
         )
         self.textbox.grid(padx=2, pady=2, row=row, column=0)
         self.textbox.bind("<Button-3>", lambda event: self.paste_text(event, target_entry=self.textbox))
         return self.textbox
-
 
     def create_batton(self, master, text, command, row, column, tooltip=None, x=None, y=None):
         self.button = ct.CTkButton(
@@ -146,7 +147,8 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.entry = ct.CTkEntry(
             master=master,
             placeholder_text=placeholder,
-            placeholder_text_color="#696969",
+            placeholder_text_color="#696969", # 696969
+            text_color="#696969", # TODO text_color
             show=show_password,
             width=300,
             height=30,
@@ -230,9 +232,15 @@ No permission to create directory. Run the script as administrator.
             subprocess.run(["reg", "add", command_key_path, "/ve", "/t", "REG_SZ", "/d", dst_file, "/f"], check=True)
 
     def drop(self, event, target_entry):
-        file_path = event.data
-        target_entry.delete(0, ct.END)
-        target_entry.insert(0, file_path)
+        if name == 'nt':
+            file_path = event.data
+            target_entry.delete(0, ct.END)
+            target_entry.insert(0, file_path)
+        else:
+            file_path = event.data
+            file_path = file_path.replace("{", "").replace("}", "")
+            target_entry.delete(0, ct.END)
+            target_entry.insert(0, file_path)
 
     def paste_text(self, event, target_entry):
         text = self.clipboard_get()
@@ -312,8 +320,8 @@ No permission to create directory. Run the script as administrator.
 
             del password, hashed_password
 
-            open_dir = os.path.dirname(file_path)
-            os.startfile(open_dir)
+            # open_dir = os.path.dirname(file_path) # open floder
+            # os.startfile(open_dir)
         except FileNotFoundError:
             self.show_error(f"Error: Unable to create or access the file at {file_path}")
         except PermissionError:
