@@ -8,7 +8,6 @@ This tool helps you hide your .txt files that store important information.
 
 # How use version GUI
 ![GUI1](https://github.com/user-attachments/assets/6d773893-ca35-4c8c-9848-72baf1d2a4c8)
-![GUI2](https://github.com/user-attachments/assets/9c2f1ca0-222e-4500-91a7-e0ff8aed7e06)
 
 1. Decryption
    - Select the OPEN tab
