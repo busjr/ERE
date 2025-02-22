@@ -71,23 +71,23 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
 
         # OPEN tabs
         self.path_entry_open = self.create_entry(tabview.tab("OPEN"), placeholder="The path to the file to open", handler=self.password_entry_open_handler, row=0)
-        self.batton_path_open = self.create_batton(tabview.tab("OPEN"), "PATH", self.path, 0, 1)
-        self.batton_context_open = self.create_batton(tabview.tab("OPEN"), "!", self.context_menu, 0, 2, tooltip="Enable context menu. (open file with admin administrator)")
+        self.batton_path_open = self.create_button(tabview.tab("OPEN"), "PATH", self.path, 0, 1)
+        self.batton_context_open = self.create_button(tabview.tab("OPEN"), "!", self.context_menu, 0, 2, tooltip="Enable context menu. (open file with admin administrator)")
 
         self.password_entry_open = self.create_entry(master=tabview.tab("OPEN"), placeholder="Password", handler=self.path_entry_open_handler, row=1, show_password="*")
-        self.show_password_open = self.create_batton(tabview.tab("OPEN"), "()", lambda: self.toggle_password_visibility(self.password_entry_open), 1, 1, tooltip="Show/Hide", x=270, y=49)
-        self.batton_ok_open = self.create_batton(tabview.tab("OPEN"), "OK", self.decrypt_aes_file, 1, 1)
-        self.batton_context_del_open = self.create_batton(tabview.tab("OPEN"), "!", self.context_menu_delete, 1, 2, tooltip="Disable context menu. (open file with admin administrator)",)
+        self.show_password_open = self.create_button(tabview.tab("OPEN"), "()", lambda: self.toggle_password_visibility(self.password_entry_open), 1, 1, tooltip="Show/Hide", x=270, y=49)
+        self.batton_ok_open = self.create_button(tabview.tab("OPEN"), "OK", self.decrypt_aes_file, 1, 1)
+        self.batton_context_del_open = self.create_button(tabview.tab("OPEN"), "!", self.context_menu_delete, 1, 2, tooltip="Disable context menu. (open file with admin administrator)",)
 
         self.box_open = self.create_textbox(tabview.tab("OPEN"), 2)
 
         # CREATE tabs
         self.path_entry_create = self.create_entry(master=tabview.tab("CREATE"), placeholder="The path to the file to open", handler=self.entry_path_create_handler, row=1)
-        self.batton_path_create = self.create_batton(tabview.tab("CREATE"), "PATH", self.path_save, 1, 1)
+        self.batton_path_create = self.create_button(tabview.tab("CREATE"), "PATH", self.path_save, 1, 1)
 
         self.password_entry_create = self.create_entry(master=tabview.tab("CREATE"), placeholder="Password", handler=self.entry_password_create_handler, row=2, show_password="*")
-        self.show_password_create = self.create_batton(tabview.tab("CREATE"), "()", lambda: self.toggle_password_visibility(self.password_entry_create), 1, 1, tooltip="Show/Hide", x=270, y=353)
-        self.batton_ok_create = self.create_batton(tabview.tab("CREATE"), "OK", self.encrypt_aes_file, 2, 1)
+        self.show_password_create = self.create_button(tabview.tab("CREATE"), "()", lambda: self.toggle_password_visibility(self.password_entry_create), 1, 1, tooltip="Show/Hide", x=270, y=353)
+        self.batton_ok_create = self.create_button(tabview.tab("CREATE"), "OK", self.encrypt_aes_file, 2, 1)
 
         self.box_create = self.create_textbox(tabview.tab("CREATE"), 0)
 
@@ -122,7 +122,7 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.textbox.bind("<Button-3>", lambda event: self.paste_text(event, target_entry=self.textbox))
         return self.textbox
 
-    def create_batton(self, master, text, command, row, column, tooltip=None, x=None, y=None):
+    def create_button(self, master, text, command, row, column, tooltip=None, x=None, y=None):
         self.button = ct.CTkButton(
             master=master,
             text=text,
@@ -165,18 +165,26 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         return self.entry
 
     def path_program(self):
-        home_dir = os.path.expanduser("~")
-        documents_dir = os.path.join(home_dir, "Documents")  # path to the target Documents
-        dst_dir = os.path.join(documents_dir, "ERE")  # path to the target directory
-        return dst_dir
+        if name == "nt":
+            home_dir = os.path.expanduser("~")
+            documents_dir = os.path.join(home_dir, "Documents")  # path to the target Documents
+            dst_dir = os.path.join(documents_dir, "ERE")  # path to the target directory
+            return dst_dir
 
     def context_menu_delete(self):
-        path = r"HKEY_CLASSES_ROOT\Directory\Background\shell\ERE"
-        command = ["reg", "delete", path, "/f"]
-        subprocess.run(command, check=True)
+        if name == "nt":
+            path = r"HKEY_CLASSES_ROOT\Directory\Background\shell\ERE"
+            command = ["reg", "delete", path, "/f"]
+            subprocess.run(command, check=True)
 
-        # delete dir and file
-        shutil.rmtree(self.path_program())
+            # delete dir and file
+            shutil.rmtree(self.path_program())
+        else:
+            path = "/home/user/.local/share/nemo/actions/ERE.nemo_action"
+            os.remove(path)
+
+            # delete dir and file
+            shutil.rmtree("/home/user/ERE/EREGUI.bin")
 
     def context_menu(self):
         message = CTkMessagebox(
@@ -200,36 +208,65 @@ If you want to enable the context menu, click "Yes"
 
         response = message.get()
 
-        if response == "Yes":
-            src = sys.argv[0]  # path to the source file
-            dst_file = os.path.join(self.path_program(), os.path.basename(src))  # full path sourse file
-
-            # create dir in "Documents"
+        if response == "Yes" and name == "nt":
             try:
-                os.makedirs(self.path_program(), exist_ok=True)
+                src = sys.argv[0]  # path to the source file
+                dst_file = os.path.join(self.path_program(), os.path.basename(src))  # full path sourse file
+
+                os.makedirs(self.path_program(), exist_ok=True) # create dir in "Documents"
+                shutil.copy(src, dst_file)  # copy source file
+
+                # create context_menu
+                base_path = r"HKEY_CLASSES_ROOT\Directory\Background\shell"
+                key_name = "ERE"
+                command_key_path = f"{base_path}\\{key_name}\\command"
+                # adds a default value "Open in ERE" to the specified registry key
+                subprocess.run(["reg", "add", f"{base_path}\\{key_name}", "/ve", "/t", "REG_SZ", "/d", "Open in ERE", "/f"], check=True)
+                # sets the default value of the command key to the path of the executable (dst_file)
+                subprocess.run(["reg", "add", command_key_path, "/ve", "/t", "REG_SZ", "/d", dst_file, "/f"], check=True)
             except PermissionError:
                 self.show_error(message="""
 No permission to create directory. Run the script as administrator.
 """)
                 sys.exit(1)
 
-            # copy source file
+        else:
             try:
-                shutil.copy(src, dst_file)
+                src = sys.argv[0]
+                user_dir = "/home/user/"
+                dst_dir = os.path.join(user_dir, "ERE")
+
+                os.makedirs(dst_dir, exist_ok=True)
+                shutil.copy(src, dst_dir)
+
+                # create context_menu
+                actions_dir = "/home/user/.local/share/nemo/actions"
+
+                # Создание директории actions если она не существует
+                if not os.path.exists(actions_dir):
+                    os.makedirs(actions_dir)
+
+                action_file_path = os.path.join(actions_dir, 'ERE.nemo_action')
+
+                action_content = f"""
+    [Nemo Action]
+    Name=Open ERE
+    Comment=ERE crypt/encrypt
+
+    Exec={dst_dir + "/EREGUI.bin"} %F
+
+    Selection=s
+
+    Extensions=any;
+    """
+
+                with open(action_file_path, 'w') as f:
+                    f.write(action_content)
             except PermissionError:
                 self.show_error(message="""
 No permission to create directory. Run the script as administrator.
 """)
                 sys.exit(1)
-
-            # create context_menu
-            base_path = r"HKEY_CLASSES_ROOT\Directory\Background\shell"
-            key_name = "ERE"
-            command_key_path = f"{base_path}\\{key_name}\\command"
-            # adds a default value "Open in ERE" to the specified registry key
-            subprocess.run(["reg", "add", f"{base_path}\\{key_name}", "/ve", "/t", "REG_SZ", "/d", "Open in ERE", "/f"], check=True)
-            # sets the default value of the command key to the path of the executable (dst_file)
-            subprocess.run(["reg", "add", command_key_path, "/ve", "/t", "REG_SZ", "/d", dst_file, "/f"], check=True)
 
     def drop(self, event, target_entry):
         if name == 'nt':
