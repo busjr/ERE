@@ -144,7 +144,7 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.batton_path_create = self.create_button(
             master=tabview.tab("CREATE"),
             text="PATH",
-            width=40,
+            width=70,
             height=30,
             command=self.path_save)
         self.batton_path_create.place(x=310, y=310)
@@ -159,7 +159,7 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.show_password_create = self.create_button(
             master=tabview.tab("CREATE"), 
             text="()", 
-            width=45, 
+            width=70, 
             height=30, 
             command=lambda: self.toggle_password_visibility(self.password_entry_create), 
             tooltip="Show/Hide")
