@@ -129,7 +129,6 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
             command=self.decrypt_aes_file)
         self.batton_ok_open.place(x=0, y=390)
         
-
         # CREATE tabs
 
         self.box_create = self.create_textbox(tabview.tab("CREATE"))
