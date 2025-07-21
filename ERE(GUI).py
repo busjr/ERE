@@ -14,7 +14,6 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 
 __version__ = "v0.7"
 
-
 class MyFrame(ct.CTkScrollableFrame):
     """
     Allows CTkScrollableFrame to be executed in CTkTextbox
@@ -37,9 +36,9 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         screen_height = self.winfo_screenheight()
 
         x = (screen_width - 400) // 2
-        y = (screen_height - 435) // 2
+        y = (screen_height - 485) // 2
 
-        self.geometry(f"400x440+{x}+{y}")
+        self.geometry(f"400x485+{x}+{y}")
         self._fg_color = "#1f1f1f"
         self.title(f"Keypy {__version__} (by busjr)")
         if name == "nt":
@@ -48,12 +47,12 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         self.icon_warning = os.path.join(os.path.dirname(__file__), "war.png")
         self.icon_que = os.path.join(os.path.dirname(__file__), "que.png")
         self.resizable(False, False)
-
+        
         # create tabs
         tabview = ct.CTkTabview(
             master=self,
             width=400,
-            height=435,
+            height=485,
             fg_color="#1f1f1f",
             segmented_button_fg_color="#2a2a2a",
             segmented_button_unselected_color="#2a2a2a",
@@ -70,26 +69,110 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
         tabview.add("CREATE")
 
         # OPEN tabs
-        self.path_entry_open = self.create_entry(tabview.tab("OPEN"), placeholder="The path to the file to open", handler=self.password_entry_open_handler, row=0)
-        self.batton_path_open = self.create_button(tabview.tab("OPEN"), "PATH", self.path, 0, 1)
-        self.batton_context_open = self.create_button(tabview.tab("OPEN"), "!", self.context_menu, 0, 2, tooltip="Enable context menu. (open file with admin administrator)")
+        self.path_entry_open = self.create_entry(
+            tabview.tab("OPEN"),
+            placeholder="The path to the file to open",
+            handler=self.password_entry_open_handler,
+            drop="yes")
+        self.path_entry_open.place(x=0, y=0)
+        
+        self.batton_path_open = self.create_button(
+            master=tabview.tab("OPEN"),
+            text="PATH",
+            width=40,
+            height=30,
+            command=self.path)
+        self.batton_path_open.place(x=310, y=0)
 
-        self.password_entry_open = self.create_entry(master=tabview.tab("OPEN"), placeholder="Password", handler=self.path_entry_open_handler, row=1, show_password="*")
-        self.show_password_open = self.create_button(tabview.tab("OPEN"), "()", lambda: self.toggle_password_visibility(self.password_entry_open), 1, 1, tooltip="Show/Hide", x=270, y=49)
-        self.batton_ok_open = self.create_button(tabview.tab("OPEN"), "OK", self.decrypt_aes_file, 1, 1)
-        self.batton_context_del_open = self.create_button(tabview.tab("OPEN"), "!", self.context_menu_delete, 1, 2, tooltip="Disable context menu. (open file with admin administrator)",)
+        self.batton_context_open = self.create_button(
+            master=tabview.tab("OPEN"),
+            text="!",
+            width=5,
+            height=30,
+            command=self.context_menu,
+            tooltip="Enable context menu. (open file with admin administrator)")
+        self.batton_context_open.place(x=360, y=0)
 
-        self.box_open = self.create_textbox(tabview.tab("OPEN"), 2)
+        self.password_entry_open = self.create_entry(
+            master=tabview.tab("OPEN"),
+            placeholder="Password",
+            handler=self.path_entry_open_handler,
+            show_password="*")
+        self.password_entry_open.place(x=0, y=40)
+        
+        self.show_password_open = self.create_button(
+            master=tabview.tab("OPEN"),
+            text="()",
+            command=lambda: self.toggle_password_visibility(self.password_entry_open),
+            tooltip="Show/Hide",
+            width=45,
+            height=30)
+        self.show_password_open.place(x=310, y=40)
+
+        self.batton_context_del_open = self.create_button(
+            master=tabview.tab("OPEN"), 
+            text="!", 
+            width=5, 
+            height=30, 
+            command=self.context_menu_delete, 
+            tooltip="Disable context menu. (open file with admin administrator)")
+        self.batton_context_del_open.place(x=360, y=40)
+
+        self.box_open = self.create_textbox(tabview.tab("OPEN"))
+        self.box_open.place(x=0, y=80)
+        
+        self.batton_ok_open = self.create_button(
+            master=tabview.tab("OPEN"),
+            text="Decrypt the file",
+            width=380,
+            height=35,
+            command=self.decrypt_aes_file)
+        self.batton_ok_open.place(x=0, y=390)
+        
 
         # CREATE tabs
-        self.path_entry_create = self.create_entry(master=tabview.tab("CREATE"), placeholder="The path to the file to open", handler=self.entry_path_create_handler, row=1)
-        self.batton_path_create = self.create_button(tabview.tab("CREATE"), "PATH", self.path_save, 1, 1)
 
-        self.password_entry_create = self.create_entry(master=tabview.tab("CREATE"), placeholder="Password", handler=self.entry_password_create_handler, row=2, show_password="*")
-        self.show_password_create = self.create_button(tabview.tab("CREATE"), "()", lambda: self.toggle_password_visibility(self.password_entry_create), 1, 1, tooltip="Show/Hide", x=270, y=353)
-        self.batton_ok_create = self.create_button(tabview.tab("CREATE"), "OK", self.encrypt_aes_file, 2, 1)
+        self.box_create = self.create_textbox(tabview.tab("CREATE"))
+        self.box_create.place(x=0, y=0)
 
-        self.box_create = self.create_textbox(tabview.tab("CREATE"), 0)
+        self.path_entry_create = self.create_entry(
+            master=tabview.tab("CREATE"),
+            placeholder="The path to the file to open",
+            handler=self.entry_path_create_handler,
+            drop="yes")
+        self.path_entry_create.place(x=0, y=310)
+
+        self.batton_path_create = self.create_button(
+            master=tabview.tab("CREATE"),
+            text="PATH",
+            width=40,
+            height=30,
+            command=self.path_save)
+        self.batton_path_create.place(x=310, y=310)
+
+        self.password_entry_create = self.create_entry(
+            master=tabview.tab("CREATE"),
+            placeholder="Password",
+            handler=self.entry_password_create_handler,
+            show_password="*")
+        self.password_entry_create.place(x=0, y=350)
+
+        self.show_password_create = self.create_button(
+            master=tabview.tab("CREATE"), 
+            text="()", 
+            width=45, 
+            height=30, 
+            command=lambda: self.toggle_password_visibility(self.password_entry_create), 
+            tooltip="Show/Hide")
+        self.show_password_create.place(x=310, y=350)
+
+        self.batton_ok_create = self.create_button(
+            master=tabview.tab("CREATE"),
+            text="Encrypt the file",
+            width=380,
+            height=35,
+            command=self.encrypt_aes_file)
+        self.batton_ok_create.place(x=0, y=390)
 
     def toggle_password_visibility(self, target_button):
         if target_button.cget("show") == "":
@@ -109,7 +192,7 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
     def entry_password_create_handler(self, event):
         self.path_entry_create.focus()
 
-    def create_textbox(self, master, row):
+    def create_textbox(self, master):
         self.textbox = ct.CTkTextbox(
             master=master,
             width=300,
@@ -118,37 +201,32 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
             text_color="#696969",
             wrap="none",
         )
-        self.textbox.grid(padx=2, pady=2, row=row, column=0)
         self.textbox.bind("<Button-3>", lambda event: self.paste_text(event, target_entry=self.textbox))
         return self.textbox
 
-    def create_button(self, master, text, command, row, column, tooltip=None, x=None, y=None):
+    def create_button(self, master, text, width, height, command, tooltip=None,):
         self.button = ct.CTkButton(
             master=master,
             text=text,
             text_color="#696969" if text != "!" else "green",
             command=command,
-            width=20 if text == "()" else 50 if text != "!" else 5,
-            height=20 if text == "()" else 30 if text != "!" else 5,
+            width=width,
+            height=height,
             fg_color="#1d1e1e",
             hover_color="#2a2c2c",
+            border_width=0
         )
-        if x is not None and y is not None:
-            self.button.place(x=x, y=y)
-        else:
-            self.button.grid(padx=5, pady=5 if text != "!" else 2, row=row, column=column)
-
         if tooltip:
             CTkToolTip(self.button, delay=0.5, message=tooltip)
 
         return self.button
 
-    def create_entry(self, master, placeholder, handler, row, show_password=None):
+    def create_entry(self, master, placeholder, handler, show_password=None, drop=None):
         self.entry = ct.CTkEntry(
             master=master,
             placeholder_text=placeholder,
-            placeholder_text_color="#696969", # 696969
-            text_color="#696969", # TODO text_color
+            placeholder_text_color="#696969",
+            text_color="#696969",
             show=show_password,
             width=300,
             height=30,
@@ -156,10 +234,9 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
             corner_radius=10,
             border_width=1,
         )
-        self.entry.grid(padx=0, pady=5, row=row, column=0)
         self.entry.bind("<Button-3>", lambda event, target_entry=self.entry: self.paste_text(event, target_entry))
         self.entry.bind("<Return>", handler)
-        if row == 0:
+        if drop:
             self.entry.drop_target_register(DND_FILES)
             self.entry.dnd_bind('<<Drop>>', lambda event, target_entry=self.entry: self.drop(event, target_entry))
         return self.entry
@@ -173,18 +250,20 @@ class App(ct.CTk, TkinterDnD.DnDWrapper):
 
     def context_menu_delete(self):
         if name == "nt":
-            path = r"HKEY_CLASSES_ROOT\Directory\Background\shell\ERE"
-            command = ["reg", "delete", path, "/f"]
-            subprocess.run(command, check=True)
+            paths = [
+                r"HKEY_CLASSES_ROOT\Directory\Background\shell\ERE",
+                r"HKEY_CLASSES_ROOT\SystemFileAssociations\.aes\shell\OpenWithERE"
+            ]
 
-            # delete dir and file
-            shutil.rmtree(self.path_program())
+            for path in paths:
+                subprocess.run(["reg", "delete", path, "/f"], check=True)
+
+            shutil.rmtree(self.path_program()) # delete dir and file
         else:
             path = "/home/user/.local/share/nemo/actions/ERE.nemo_action"
             os.remove(path)
 
-            # delete dir and file
-            shutil.rmtree("/home/user/ERE/EREGUI.bin")
+            shutil.rmtree("/home/user/ERE/EREGUI.bin") # delete dir and file
 
     def context_menu(self):
         message = CTkMessagebox(
@@ -213,6 +292,9 @@ If you want to enable the context menu, click "Yes"
                 src = sys.argv[0]  # path to the source file
                 dst_file = os.path.join(self.path_program(), os.path.basename(src))  # full path sourse file
 
+                # dst_icon_file = dst_file.replace("ERE.exe", "icon.ico")
+                command_open = f'"{dst_file}" "%1"'
+
                 os.makedirs(self.path_program(), exist_ok=True) # create dir in "Documents"
                 shutil.copy(src, dst_file)  # copy source file
 
@@ -220,14 +302,24 @@ If you want to enable the context menu, click "Yes"
                 base_path = r"HKEY_CLASSES_ROOT\Directory\Background\shell"
                 key_name = "ERE"
                 command_key_path = f"{base_path}\\{key_name}\\command"
+
                 # adds a default value "Open in ERE" to the specified registry key
                 subprocess.run(["reg", "add", f"{base_path}\\{key_name}", "/ve", "/t", "REG_SZ", "/d", "Open in ERE", "/f"], check=True)
+
                 # sets the default value of the command key to the path of the executable (dst_file)
                 subprocess.run(["reg", "add", command_key_path, "/ve", "/t", "REG_SZ", "/d", dst_file, "/f"], check=True)
+
+                # sets icon for .aes file
+                # subprocess.run(["reg", "add", "HKEY_CLASSES_ROOT\.aes", "/ve", "/t", "REG_SZ", "/d", "", "/f"], check=True)
+                # subprocess.run(["reg", "add", "HKEY_CLASSES_ROOT\.aes\DefaultIcon", "/ve", "/t", "REG_SZ", "/d", f"dst_icon_file", "/f"], check=True)
+
+                # adds the default value "Open in ERE" at RMB to the specified registry key
+                subprocess.run(["reg", "add", r"HKEY_CLASSES_ROOT\SystemFileAssociations\.aes\shell\OpenWithERE", "/ve", "/t", "REG_SZ", "/d", "Открыть с помощью ERE", "/f"], check=True)
+                subprocess.run(["reg", "add", r"HKEY_CLASSES_ROOT\SystemFileAssociations\.aes\shell\OpenWithERE\command", "/ve", "/t", "REG_SZ", "/d", command_open, "/f"], check=True)
+
+
             except PermissionError:
-                self.show_error(message="""
-No permission to create directory. Run the script as administrator.
-""")
+                self.show_error(message="No permission to create directory. Run the script as administrator.")
                 sys.exit(1)
 
         else:
@@ -249,23 +341,20 @@ No permission to create directory. Run the script as administrator.
                 action_file_path = os.path.join(actions_dir, 'ERE.nemo_action')
 
                 action_content = f"""
-    [Nemo Action]
-    Name=Open ERE
-    Comment=ERE crypt/encrypt
+[Nemo Action]
+Name=Open ERE
+Comment=ERE crypt/encrypt
 
-    Exec={dst_dir + "/EREGUI.bin"} %F
+Exec={dst_dir + "/EREGUI.bin"} %F
 
-    Selection=s
+Selection=s
 
-    Extensions=any;
-    """
-
+Extensions=any;
+ """
                 with open(action_file_path, 'w') as f:
                     f.write(action_content)
             except PermissionError:
-                self.show_error(message="""
-No permission to create directory. Run the script as administrator.
-""")
+                self.show_error(message="No permission to create directory. Run the script as administrator.")
                 sys.exit(1)
 
     def drop(self, event, target_entry):
@@ -357,8 +446,13 @@ No permission to create directory. Run the script as administrator.
 
             del password, hashed_password
 
-            # open_dir = os.path.dirname(file_path) # open floder
-            # os.startfile(open_dir)
+            if name == "nt": # open floder
+                dir_path = os.path.dirname(file_path) 
+                os.startfile(dir_path)
+            else:
+                dir_path = os.path.abspath(file_path)
+                subprocess.run(["xdg-open", dir_path])
+
         except FileNotFoundError:
             self.show_error(f"Error: Unable to create or access the file at {file_path}")
         except PermissionError:
