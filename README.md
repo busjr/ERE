@@ -7,7 +7,9 @@ This tool helps you hide your .txt files that store important information.
 - Ensure the confidentiality and integrity of their data through secure encryption and decryption processes
 
 # How use version GUI
-![GUI1](https://github.com/user-attachments/assets/6d773893-ca35-4c8c-9848-72baf1d2a4c8)
+![GUI1](https://github.com/user-attachments/assets/c4ef4b3d-0704-4be3-a3de-7e103c12112b)
+![GUI2](https://github.com/user-attachments/assets/da82ea32-86fa-48c3-b77c-6bc1ee5dac97)
+
 
 1. Decryption
    - Select the OPEN tab
